@@ -49,6 +49,7 @@ export class PerfilDeportivoController {
     @Param('idDeportista') idDeportista: string,
     @Body() perfilDeportivoDto: PerfilDeportivoDto,
   ) {
+    //TODO: Validar que idDeportista exista
     const idMolestiaNoValido = await this.validarMolestias(
       perfilDeportivoDto.molestias,
     );
@@ -84,7 +85,7 @@ export class PerfilDeportivoController {
     return await this.perfilDeportivoService.create(perfilDeportivoEntity);
   }
 
-  private async validarMolestias(molestias: string[]) {
+  private async validarMolestias(molestias: number[]) {
     let idMolestiaNoValido = undefined;
     for (let i = 0; i < molestias.length; i++) {
       try {
@@ -117,7 +118,7 @@ export class PerfilDeportivoController {
     return idMolestiaNoValido;
   }
 
-  private async validarLesiones(lesiones: string[]) {
+  private async validarLesiones(lesiones: number[]) {
     let idLesionNoValido = undefined;
     for (let i = 0; i < lesiones.length; i++) {
       const lesionId = lesiones[i];

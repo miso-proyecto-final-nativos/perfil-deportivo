@@ -3,8 +3,8 @@ import { PerfilDeportivoEntity } from './perfil-deportivo.entity';
 
 @Entity()
 export class HistoriaDeportivaEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column()
   edadInicioPractica: number;
@@ -22,7 +22,7 @@ export class HistoriaDeportivaEntity {
   ciudad: string;
 
   @Column()
-  idDeporte: string;
+  idDeporte: number;
 
   @ManyToOne(
     () => PerfilDeportivoEntity,

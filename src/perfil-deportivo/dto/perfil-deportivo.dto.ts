@@ -13,10 +13,10 @@ export class PerfilDeportivoDto {
   ftpActual: number;
 
   @IsArray()
-  molestias?: string[];
+  molestias?: number[];
 
   @IsArray()
-  lesiones?: string[];
+  lesiones?: number[];
 
   @IsArray()
   historiasDeportivas?: HistoriaDeportivaDto[];
