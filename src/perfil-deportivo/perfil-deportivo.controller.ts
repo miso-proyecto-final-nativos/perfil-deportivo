@@ -208,4 +208,9 @@ export class PerfilDeportivoController {
     }
     return idDeporteNoValido;
   }
+
+  @Get('health')
+  async healthCheck(): Promise<string> {
+    return 'All good!';
+  }
 }
