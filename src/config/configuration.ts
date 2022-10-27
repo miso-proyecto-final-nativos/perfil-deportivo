@@ -8,6 +8,10 @@ export const configuration = () => ({
     host: process.env.MS_CATALOGO_HOST,
     port: parseInt(process.env.MS_CATALOGO_PORT, 10) || 4020,
   },
+  usuario_microservice: {
+    host: process.env.USUARIO_MS_HOST,
+    port: parseInt(process.env.USUARIO_MS_PORT, 10) || 4010,
+  },
   database: {
     host: process.env.DATABASE_HOST,
     port: parseInt(process.env.DATABASE_PORT, 10) || 5432,

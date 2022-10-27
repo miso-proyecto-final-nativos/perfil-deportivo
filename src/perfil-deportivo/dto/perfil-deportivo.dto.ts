@@ -4,7 +4,7 @@ import { HistoriaDeportivaDto } from './historia-deportiva.dto';
 export class PerfilDeportivoDto {
   @IsString()
   @IsNotEmpty()
-  idDeportista: string;
+  idDeportista: number;
 
   @IsNotEmpty()
   vo2Max: number;

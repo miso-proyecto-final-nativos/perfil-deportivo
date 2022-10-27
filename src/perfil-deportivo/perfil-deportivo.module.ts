@@ -43,6 +43,18 @@ import { PerfilDeportivoController } from './perfil-deportivo.controller';
           },
         }),
     },
+    {
+      provide: 'USER_MS',
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) =>
+        ClientProxyFactory.create({
+          transport: Transport.TCP,
+          options: {
+            host: configService.get<string>('usuario_microservice.host'),
+            port: configService.get<number>('usuario_microservice.port'),
+          },
+        }),
+    },
     PerfilDeportivoService,
   ],
   controllers: [PerfilDeportivoController],
