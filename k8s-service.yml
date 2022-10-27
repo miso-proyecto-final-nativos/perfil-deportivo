@@ -123,7 +123,7 @@ spec:
                   optional: false
           # Realizar pull siempre a la imagen
           imagePullPolicy: Always
-      serviceAccountName: ksa-sportapp
+      serviceAccountName: ksa-dev-sportapp
 
 # Vamos a especificar el balanceador de carga en este mismo archivo
 # para ello vamos a crear otro documento separado, esto se hace con el operador "---"
