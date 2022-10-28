@@ -34,21 +34,23 @@ import { PerfilDeportivoService } from './perfil-deportivo.service';
 export class PerfilDeportivoController {
   constructor(
     @Inject('MS_CATALOGO_SERVICE') private clienteCatalogoService: ClientProxy,
+    @Inject('USER_MS') private clienteUsuarioService: ClientProxy,
     private readonly perfilDeportivoService: PerfilDeportivoService,
   ) {}
 
   @UseGuards(AuthGuard)
-  @Get(':deportistaId')
-  async findByDeportistaId(@Param('deportistaId') deportistaId: string) {
-    return await this.perfilDeportivoService.findByDeportistaId(deportistaId);
+  @Get(':idDeportista')
+  async findByDeportistaId(@Param('idDeportista') idDeportista: number) {
+    return await this.perfilDeportivoService.findByDeportistaId(idDeportista);
   }
 
   @UseGuards(AuthGuard)
   @Post(':idDeportista')
   async create(
-    @Param('idDeportista') idDeportista: string,
+    @Param('idDeportista') idDeportista: number,
     @Body() perfilDeportivoDto: PerfilDeportivoDto,
   ) {
+    await this.validarIdDeportista(idDeportista);
     const idMolestiaNoValido = await this.validarMolestias(
       perfilDeportivoDto.molestias,
     );
@@ -83,8 +85,30 @@ export class PerfilDeportivoController {
     );
     return await this.perfilDeportivoService.create(perfilDeportivoEntity);
   }
+  private async validarIdDeportista(idDeportista: number) {
+    const molestia$ = this.clienteUsuarioService
+      .send({ role: 'user', cmd: 'getById' }, { idDeportista })
+      .pipe(
+        timeout(5000),
+        catchError((err) => {
+          if (err instanceof TimeoutError) {
+            return throwError(() => new RequestTimeoutException());
+          }
+          return throwError(() => err);
+        }),
+      );
 
-  private async validarMolestias(molestias: string[]) {
+    const molestia = await firstValueFrom(molestia$);
+
+    if (!molestia) {
+      throw new BusinessLogicException(
+        `No se encontró un deportista con el ${idDeportista}`,
+        BusinessError.NOT_FOUND,
+      );
+    }
+  }
+
+  private async validarMolestias(molestias: number[]) {
     let idMolestiaNoValido = undefined;
     for (let i = 0; i < molestias.length; i++) {
       try {
@@ -117,7 +141,7 @@ export class PerfilDeportivoController {
     return idMolestiaNoValido;
   }
 
-  private async validarLesiones(lesiones: string[]) {
+  private async validarLesiones(lesiones: number[]) {
     let idLesionNoValido = undefined;
     for (let i = 0; i < lesiones.length; i++) {
       const lesionId = lesiones[i];
@@ -183,5 +207,10 @@ export class PerfilDeportivoController {
       }
     }
     return idDeporteNoValido;
+  }
+
+  @Get('health')
+  async healthCheck(): Promise<string> {
+    return 'All good!';
   }
 }

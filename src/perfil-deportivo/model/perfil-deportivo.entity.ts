@@ -4,7 +4,7 @@ import { HistoriaDeportivaEntity } from './historia-deportiva.entity';
 @Entity()
 export class PerfilDeportivoEntity {
   @PrimaryColumn()
-  idDeportista: string;
+  idDeportista: number;
 
   @Column({ type: 'real' })
   vo2Max: number;
@@ -13,10 +13,10 @@ export class PerfilDeportivoEntity {
   ftpActual: number;
 
   @Column({ array: true })
-  molestias?: string;
+  molestias?: number;
 
   @Column({ array: true })
-  lesiones?: string;
+  lesiones?: number;
 
   @OneToMany(
     () => HistoriaDeportivaEntity,

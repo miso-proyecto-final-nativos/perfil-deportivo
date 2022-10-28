@@ -15,7 +15,7 @@ export class PerfilDeportivoService {
   ) {}
 
   async findByDeportistaId(
-    idDeportista: string,
+    idDeportista: number,
   ): Promise<PerfilDeportivoEntity> {
     const perfilDeportivo: PerfilDeportivoEntity =
       await this.perfilDeportivoRepository.findOne({
@@ -37,7 +37,7 @@ export class PerfilDeportivoService {
     return await this.perfilDeportivoRepository.save(perfilDeportivo);
   }
 
-  private async validarIdDeportista(idDeportista: string) {
+  private async validarIdDeportista(idDeportista: number) {
     const perfilDeportivo: PerfilDeportivoEntity =
       await this.perfilDeportivoRepository.findOne({
         where: { idDeportista: idDeportista },
@@ -50,7 +50,7 @@ export class PerfilDeportivoService {
   }
 
   async update(
-    idDeportista: string,
+    idDeportista: number,
     perfilDeportivo: PerfilDeportivoEntity,
   ): Promise<PerfilDeportivoEntity> {
     const persistedPerfilDeportivo: PerfilDeportivoEntity =
