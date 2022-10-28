@@ -81,16 +81,16 @@ spec:
                 configMapKeyRef:
                   name: perfil-deportivo-config-map
                   key: MS_CATALOGO_PORT
-            - name: USUARIO_MS_HOST
+            - name: USER_MS_HOST
               valueFrom:
                 configMapKeyRef:
                   name: perfil-deportivo-config-map
-                  key: USUARIO_MS_HOST
-            - name: USUARIO_MS_PORT
+                  key: USER_MS_HOST
+            - name: USER_MS_PORT
               valueFrom:
                 configMapKeyRef:
                   name: perfil-deportivo-config-map
-                  key: USUARIO_MS_PORT
+                  key: USER_MS_PORT
             - name: DATABASE_USER
               valueFrom:
                 secretKeyRef:
@@ -184,6 +184,6 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: ms-perfil-deportivo
-  minReplicas: 3
-  maxReplicas: 10
+  minReplicas: 1
+  maxReplicas: 2
   targetCPUUtilizationPercentage: 60
