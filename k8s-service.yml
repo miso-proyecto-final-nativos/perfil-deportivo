@@ -11,7 +11,7 @@ metadata:
     app: ms-perfil-deportivo
 # Especificaciones del elemento
 spec:
-  replicas: 30
+  replicas: 2
   # K8s agrupa los elementos del Deployment y los interconecta entre si utilizando etiquetas
   # Aqui definimos como seleccionar los elementos juntos
   selector:
