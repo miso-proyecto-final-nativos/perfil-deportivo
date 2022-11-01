@@ -7,6 +7,7 @@ import { HistoriaDeportivaEntity } from './model/historia-deportiva.entity';
 import { PerfilDeportivoEntity } from './model/perfil-deportivo.entity';
 import { PerfilDeportivoService } from './perfil-deportivo.service';
 import { PerfilDeportivoController } from './perfil-deportivo.controller';
+import { TerminusModule } from '@nestjs/terminus';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { PerfilDeportivoController } from './perfil-deportivo.controller';
       load: [configuration],
     }),
     TypeOrmModule.forFeature([PerfilDeportivoEntity, HistoriaDeportivaEntity]),
+    TerminusModule,
   ],
   providers: [
     {

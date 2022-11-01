@@ -13,6 +13,11 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import {
+  HealthCheck,
+  HealthCheckService,
+  TypeOrmHealthIndicator,
+} from '@nestjs/terminus';
 import { plainToInstance } from 'class-transformer';
 import {
   catchError,
@@ -39,11 +44,14 @@ export class PerfilDeportivoController {
     @Inject('MS_CATALOGO_SERVICE') private clienteCatalogoService: ClientProxy,
     @Inject('USER_MS') private clienteUsuarioService: ClientProxy,
     private readonly perfilDeportivoService: PerfilDeportivoService,
+    private health: HealthCheckService,
+    private db: TypeOrmHealthIndicator,
   ) {}
 
   @Get('health')
-  async healthCheck(): Promise<string> {
-    return 'All good!';
+  @HealthCheck()
+  async healthCheck() {
+    return this.health.check([async () => this.db.pingCheck('database')]);
   }
 
   @UseGuards(AuthGuard)
