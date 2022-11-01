@@ -6,12 +6,15 @@ import {
 } from '../shared/errors/business-errors';
 import { Repository } from 'typeorm';
 import { PerfilDeportivoEntity } from './model/perfil-deportivo.entity';
+import { HistoriaDeportivaEntity } from './model/historia-deportiva.entity';
 
 @Injectable()
 export class PerfilDeportivoService {
   constructor(
     @InjectRepository(PerfilDeportivoEntity)
     private readonly perfilDeportivoRepository: Repository<PerfilDeportivoEntity>,
+    @InjectRepository(HistoriaDeportivaEntity)
+    private readonly historiaDeportivaRepository: Repository<HistoriaDeportivaEntity>,
   ) {}
 
   async findByDeportistaId(
@@ -56,6 +59,7 @@ export class PerfilDeportivoService {
     const persistedPerfilDeportivo: PerfilDeportivoEntity =
       await this.perfilDeportivoRepository.findOne({
         where: { idDeportista: idDeportista },
+        relations: ['historiasDeportivas'],
       });
     if (!persistedPerfilDeportivo) {
       throw new BusinessLogicException(
@@ -63,9 +67,34 @@ export class PerfilDeportivoService {
         BusinessError.NOT_FOUND,
       );
     }
+    await this.eliminarHistoriasDeportivas(persistedPerfilDeportivo);
     return await this.perfilDeportivoRepository.save({
       ...persistedPerfilDeportivo,
       ...perfilDeportivo,
     });
+  }
+
+  async delete(idDeportista: number) {
+    const perfilDeportivo: PerfilDeportivoEntity =
+      await this.perfilDeportivoRepository.findOne({
+        where: { idDeportista: idDeportista },
+      });
+    if (!perfilDeportivo) {
+      throw new BusinessLogicException(
+        'No se encontró un perfil deportivo con el id suministrado',
+        BusinessError.NOT_FOUND,
+      );
+    }
+    await this.perfilDeportivoRepository.delete(perfilDeportivo);
+  }
+
+  private async eliminarHistoriasDeportivas(
+    perfilDeportivoEntity: PerfilDeportivoEntity,
+  ) {
+    perfilDeportivoEntity.historiasDeportivas.forEach(
+      async (historiaDeportivaEntity) => {
+        await this.historiaDeportivaRepository.delete(historiaDeportivaEntity);
+      },
+    );
   }
 }

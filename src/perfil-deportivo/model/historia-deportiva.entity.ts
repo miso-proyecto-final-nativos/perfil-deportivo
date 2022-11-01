@@ -27,6 +27,9 @@ export class HistoriaDeportivaEntity {
   @ManyToOne(
     () => PerfilDeportivoEntity,
     (perfilDeportivo) => perfilDeportivo.historiasDeportivas,
+    {
+      onDelete: 'CASCADE',
+    },
   )
   perfilDeportivo: PerfilDeportivoEntity;
 }

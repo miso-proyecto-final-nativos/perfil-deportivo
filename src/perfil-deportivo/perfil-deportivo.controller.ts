@@ -1,10 +1,13 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   Inject,
   Param,
   Post,
+  Put,
   RequestTimeoutException,
   UseGuards,
   UseInterceptors,
@@ -38,6 +41,11 @@ export class PerfilDeportivoController {
     private readonly perfilDeportivoService: PerfilDeportivoService,
   ) {}
 
+  @Get('health')
+  async healthCheck(): Promise<string> {
+    return 'All good!';
+  }
+
   @UseGuards(AuthGuard)
   @Get(':idDeportista')
   async findByDeportistaId(@Param('idDeportista') idDeportista: number) {
@@ -51,6 +59,41 @@ export class PerfilDeportivoController {
     @Body() perfilDeportivoDto: PerfilDeportivoDto,
   ) {
     await this.validarIdDeportista(idDeportista);
+    await this.validarDatosperfil(perfilDeportivoDto);
+    perfilDeportivoDto.idDeportista = idDeportista;
+    const perfilDeportivoEntity: PerfilDeportivoEntity = plainToInstance(
+      PerfilDeportivoEntity,
+      perfilDeportivoDto,
+    );
+    return await this.perfilDeportivoService.create(perfilDeportivoEntity);
+  }
+
+  @UseGuards(AuthGuard)
+  @Put(':idDeportista')
+  async update(
+    @Param('idDeportista') idDeportista: number,
+    @Body() perfilDeportivoDto: PerfilDeportivoDto,
+  ) {
+    await this.validarDatosperfil(perfilDeportivoDto);
+    perfilDeportivoDto.idDeportista = idDeportista;
+    const perfilDeportivoEntity: PerfilDeportivoEntity = plainToInstance(
+      PerfilDeportivoEntity,
+      perfilDeportivoDto,
+    );
+    return await this.perfilDeportivoService.update(
+      idDeportista,
+      perfilDeportivoEntity,
+    );
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete(':idDeportista')
+  @HttpCode(204)
+  async delete(@Param('idDeportista') idDeportista: number) {
+    return await this.perfilDeportivoService.delete(idDeportista);
+  }
+
+  private async validarDatosperfil(perfilDeportivoDto: PerfilDeportivoDto) {
     const idMolestiaNoValido = await this.validarMolestias(
       perfilDeportivoDto.molestias,
     );
@@ -78,13 +121,8 @@ export class PerfilDeportivoController {
         BusinessError.NOT_FOUND,
       );
     }
-    perfilDeportivoDto.idDeportista = idDeportista;
-    const perfilDeportivoEntity: PerfilDeportivoEntity = plainToInstance(
-      PerfilDeportivoEntity,
-      perfilDeportivoDto,
-    );
-    return await this.perfilDeportivoService.create(perfilDeportivoEntity);
   }
+
   private async validarIdDeportista(idDeportista: number) {
     const molestia$ = this.clienteUsuarioService
       .send({ role: 'user', cmd: 'getById' }, { idDeportista })
@@ -102,7 +140,7 @@ export class PerfilDeportivoController {
 
     if (!molestia) {
       throw new BusinessLogicException(
-        `No se encontró un deportista con el ${idDeportista}`,
+        `No se encontró un deportista con el id ${idDeportista}`,
         BusinessError.NOT_FOUND,
       );
     }
@@ -207,10 +245,5 @@ export class PerfilDeportivoController {
       }
     }
     return idDeporteNoValido;
-  }
-
-  @Get('health')
-  async healthCheck(): Promise<string> {
-    return 'All good!';
   }
 }

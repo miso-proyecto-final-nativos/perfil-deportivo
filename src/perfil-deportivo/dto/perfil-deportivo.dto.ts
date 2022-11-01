@@ -1,8 +1,11 @@
-import { IsArray, IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsNotEmpty, IsNumber } from 'class-validator';
 import { HistoriaDeportivaDto } from './historia-deportiva.dto';
 
 export class PerfilDeportivoDto {
-  @IsString()
+  @IsNumber()
+  id: number;
+
+  @IsNumber()
   @IsNotEmpty()
   idDeportista: number;
 
