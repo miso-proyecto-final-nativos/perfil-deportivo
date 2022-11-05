@@ -1,15 +1,23 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   Inject,
   Param,
   Post,
+  Put,
   RequestTimeoutException,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import {
+  HealthCheck,
+  HealthCheckService,
+  TypeOrmHealthIndicator,
+} from '@nestjs/terminus';
 import { plainToInstance } from 'class-transformer';
 import {
   catchError,
@@ -36,7 +44,15 @@ export class PerfilDeportivoController {
     @Inject('MS_CATALOGO_SERVICE') private clienteCatalogoService: ClientProxy,
     @Inject('USER_MS') private clienteUsuarioService: ClientProxy,
     private readonly perfilDeportivoService: PerfilDeportivoService,
+    private health: HealthCheckService,
+    private db: TypeOrmHealthIndicator,
   ) {}
+
+  @Get('health')
+  @HealthCheck()
+  async healthCheck() {
+    return this.health.check([async () => this.db.pingCheck('database')]);
+  }
 
   @UseGuards(AuthGuard)
   @Get(':idDeportista')
@@ -51,6 +67,41 @@ export class PerfilDeportivoController {
     @Body() perfilDeportivoDto: PerfilDeportivoDto,
   ) {
     await this.validarIdDeportista(idDeportista);
+    await this.validarDatosperfil(perfilDeportivoDto);
+    perfilDeportivoDto.idDeportista = idDeportista;
+    const perfilDeportivoEntity: PerfilDeportivoEntity = plainToInstance(
+      PerfilDeportivoEntity,
+      perfilDeportivoDto,
+    );
+    return await this.perfilDeportivoService.create(perfilDeportivoEntity);
+  }
+
+  @UseGuards(AuthGuard)
+  @Put(':idDeportista')
+  async update(
+    @Param('idDeportista') idDeportista: number,
+    @Body() perfilDeportivoDto: PerfilDeportivoDto,
+  ) {
+    await this.validarDatosperfil(perfilDeportivoDto);
+    perfilDeportivoDto.idDeportista = idDeportista;
+    const perfilDeportivoEntity: PerfilDeportivoEntity = plainToInstance(
+      PerfilDeportivoEntity,
+      perfilDeportivoDto,
+    );
+    return await this.perfilDeportivoService.update(
+      idDeportista,
+      perfilDeportivoEntity,
+    );
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete(':idDeportista')
+  @HttpCode(204)
+  async delete(@Param('idDeportista') idDeportista: number) {
+    return await this.perfilDeportivoService.delete(idDeportista);
+  }
+
+  private async validarDatosperfil(perfilDeportivoDto: PerfilDeportivoDto) {
     const idMolestiaNoValido = await this.validarMolestias(
       perfilDeportivoDto.molestias,
     );
@@ -78,13 +129,8 @@ export class PerfilDeportivoController {
         BusinessError.NOT_FOUND,
       );
     }
-    perfilDeportivoDto.idDeportista = idDeportista;
-    const perfilDeportivoEntity: PerfilDeportivoEntity = plainToInstance(
-      PerfilDeportivoEntity,
-      perfilDeportivoDto,
-    );
-    return await this.perfilDeportivoService.create(perfilDeportivoEntity);
   }
+
   private async validarIdDeportista(idDeportista: number) {
     const molestia$ = this.clienteUsuarioService
       .send({ role: 'user', cmd: 'getById' }, { idDeportista })
@@ -102,7 +148,7 @@ export class PerfilDeportivoController {
 
     if (!molestia) {
       throw new BusinessLogicException(
-        `No se encontró un deportista con el ${idDeportista}`,
+        `No se encontró un deportista con el id ${idDeportista}`,
         BusinessError.NOT_FOUND,
       );
     }
@@ -207,10 +253,5 @@ export class PerfilDeportivoController {
       }
     }
     return idDeporteNoValido;
-  }
-
-  @Get('health')
-  async healthCheck(): Promise<string> {
-    return 'All good!';
   }
 }

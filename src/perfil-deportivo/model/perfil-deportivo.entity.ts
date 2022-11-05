@@ -1,9 +1,12 @@
-import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { HistoriaDeportivaEntity } from './historia-deportiva.entity';
 
 @Entity()
 export class PerfilDeportivoEntity {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ unique: true })
   idDeportista: number;
 
   @Column({ type: 'real' })
