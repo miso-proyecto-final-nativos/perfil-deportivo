@@ -56,7 +56,7 @@ describe('PerfilDeportivoService', () => {
     });
   };
 
-  it('El servicio de perfil deportivo debe estar debinido', () => {
+  it('El servicio de perfil deportivo debe estar definido', () => {
     expect(service).toBeDefined();
   });
 
